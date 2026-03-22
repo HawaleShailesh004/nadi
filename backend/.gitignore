@@ -8,3 +8,9 @@ data/synthea_output/*.json
 
 # Generated unified patient timeline (run: python test_pipeline.py)
 data/sarah_timeline.json
+
+# Pre-baked demo package (run: python cache_demo_response.py)
+data/sarah_demo_cache.json
+
+# Local fingerprint cache for skipping redundant Pinecone upserts
+data/.pinecone_upsert_cache/

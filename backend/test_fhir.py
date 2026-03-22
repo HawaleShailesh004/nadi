@@ -1,10 +1,13 @@
-# FHIR parser smoke test — run from backend/: python test_fhir.py
+# FHIR parser smoke test — run from backend/ or repo root
 import sys
+from pathlib import Path
 
-sys.path.insert(0, ".")
+_BACKEND = Path(__file__).resolve().parent
+sys.path.insert(0, str(_BACKEND))
 from ingestion.fhir_parser import parse_patient_fhir, validate_parsed_data
 
-data = parse_patient_fhir("data/synthea_output/sarah.json")
+_fhir_path = _BACKEND / "data" / "synthea_output" / "sarah.json"
+data = parse_patient_fhir(str(_fhir_path))
 
 print("=== PATIENT ===")
 print(f"Name: {data['name']}")

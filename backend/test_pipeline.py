@@ -16,7 +16,8 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+_BACKEND = Path(__file__).resolve().parent
+sys.path.insert(0, str(_BACKEND))
 
 from ingestion.fhir_parser import parse_patient_fhir, validate_parsed_data
 from ingestion.wearable_generator import load_wearable_data
@@ -29,7 +30,7 @@ print("=" * 60)
 # ── STEP 1: Parse FHIR ────────────────────────────────────────
 print("\n[1/3] Parsing FHIR data...")
 try:
-    fhir_data = parse_patient_fhir("data/synthea_output/sarah.json")
+    fhir_data = parse_patient_fhir(str(_BACKEND / "data" / "synthea_output" / "sarah.json"))
     warnings = validate_parsed_data(fhir_data)
     print(f"  ✓ Patient: {fhir_data['name']}")
     print(f"  ✓ Conditions: {len(fhir_data['conditions'])}")
@@ -45,7 +46,7 @@ except Exception as e:
 # ── STEP 2: Load Wearable Data ────────────────────────────────
 print("\n[2/3] Loading wearable data...")
 try:
-    wearable = load_wearable_data("data/terra_mock/sarah_wearable.json")
+    wearable = load_wearable_data(str(_BACKEND / "data" / "terra_mock" / "sarah_wearable.json"))
     records = wearable.get("data", [])
     print(f"  ✓ Days of data: {len(records)}")
     print(f"  ✓ Latest HR: {records[-1]['heart_rate_resting']} bpm")
@@ -58,7 +59,7 @@ except Exception as e:
 # ── STEP 3: Build Unified Timeline ───────────────────────────
 print("\n[3/3] Building Unified Patient Timeline...")
 try:
-    meds_df = pd.read_csv("data/medications.csv")
+    meds_df = pd.read_csv(_BACKEND / "data" / "medications.csv")
     sarah_meds = meds_df[meds_df["patient_id"] == "sarah"].copy()
 
     timeline = build_patient_timeline(fhir_data, wearable, sarah_meds)
@@ -74,13 +75,15 @@ except Exception as e:
     sys.exit(1)
 
 # ── SAVE OUTPUT ───────────────────────────────────────────────
-Path("data").mkdir(parents=True, exist_ok=True)
-with open("data/sarah_timeline.json", "w", encoding="utf-8") as f:
+_data_dir = _BACKEND / "data"
+_data_dir.mkdir(parents=True, exist_ok=True)
+_timeline_path = _data_dir / "sarah_timeline.json"
+with open(_timeline_path, "w", encoding="utf-8") as f:
     json.dump(timeline, f, indent=2)
 
 print("\n" + "=" * 60)
 print("ALL STEPS PASSED ✓")
-print("Timeline saved to: data/sarah_timeline.json")
+print(f"Timeline saved to: {_timeline_path.relative_to(_BACKEND)}")
 print("=" * 60)
 
 # ── PRINT TIMELINE SUMMARY ────────────────────────────────────
