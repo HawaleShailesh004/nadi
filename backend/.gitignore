@@ -2,3 +2,6 @@
 venv/
 __pycache__/
 *.pyc
+
+# Synthea FHIR bundles are large; copy or generate locally
+data/synthea_output/*.json
