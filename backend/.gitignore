@@ -5,3 +5,6 @@ __pycache__/
 
 # Synthea FHIR bundles are large; copy or generate locally
 data/synthea_output/*.json
+
+# Generated unified patient timeline (run: python test_pipeline.py)
+data/sarah_timeline.json
